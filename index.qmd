@@ -13,6 +13,7 @@ library(dplyr)
 library(ggplot2)
 library(qualtRics)
 library(lubridate)
+library(qrcode)
 
 # qualtRics secrets are read from the environment:
 # - QUALTRICS_API_KEY
@@ -21,6 +22,18 @@ library(lubridate)
 
 message(Sys.getenv("QUALTRICS_BASE_URL"))
 
+# The repository name
+
+message(Sys.getenv("GITHUB_REPOSITORY"))
+
+# Process the repository name to generate the URL
+# - split the two components
+# - combine them into a URL with 'github.io' in the middle
+
+GITHUB_REPOSITORY <- Sys.getenv("GITHUB_REPOSITORY")
+GITHUB_REPOSITORY_PARTS <- strsplit(GITHUB_REPOSITORY, "/")[[1]]
+REPOSITORY_URL <- paste0("https://github.com/", GITHUB_REPOSITORY)
+WEBSITE_URL <- paste0("https://", GITHUB_REPOSITORY_PARTS[1], ".github.io/", GITHUB_REPOSITORY_PARTS[2])
 
 # Qualtrics data for Day 1:
 # you can find this with all_surveys() %>% arrange(creationDate) %>% head()
@@ -33,8 +46,8 @@ QUALTRICS_DAY2 <- "SV_cNkhKL69K2Ob7o2"
 
 # Time when this was posted (discard anything before that)
 
-QUALTRICS_DAY2_STIME <- ymd_hms("2025-01-21 23:59:00")
-QUALTRICS_DAY2_ETIME <- ymd_hms("2025-02-14 23:59:00")
+QUALTRICS_DAY2_STIME <- ymd_hms("2025-02-11 23:59:00")
+QUALTRICS_DAY2_ETIME <- ymd_hms("2025-02-20 23:59:00")
 
 if (!dir.exists(here::here("data"))) {
   dir.create(here::here("data"))
@@ -43,6 +56,16 @@ if (!dir.exists(here::here("data"))) {
 
 ::: {.panel-tabset}
 
+## Follow along
+
+```{r qrcode}
+#| echo: false
+
+code <- qr_code(WEBSITE_URL)
+plot(code)
+
+```
+
 
 ## Day 1
 
@@ -50,10 +73,23 @@ One of the following (or a linear combination):
 
 - [Setting yourself up for reproducibility](https://larsvilhuber.github.io/day1-tutorial/)
 - [How to correctly document a replication package](https://larsvilhuber.github.io/readme-presentation/)
+- [Reproducibility for LLM and AI](https://larsvilhuber.github.io/reproducibility-for-llm/presentation/)
 
 
 
-## Survey 2
+
+## Day 2
+
+One of the following (or a linear combination):
+
+- [Reproducibility when some data are confidential](https://labordynamicsinstitute.github.io/reproducibility-confidential/) 
+- [Advanced self-checking of reproducibility](https://larsvilhuber.github.io/self-checking-reproducibility/presentation/)
+- Preserving raw survey data
+  - <https://labordynamicsinstitute.github.io/replication-tutorial-2019/#/18>
+  - <https://labordynamicsinstitute.github.io/tutorial-data-sharing-archiving-2021/#/2> (possibly challenging)
+
+
+## Survey for Day 2
 
 To identify what we should be speaking about on Day 2, please fill out this other survey:
 
@@ -68,7 +104,7 @@ data2.raw <- fetch_survey(surveyID = QUALTRICS_DAY2, verbose = TRUE)
 data2 <- data2.raw |>
         filter(Status != "Survey Preview") |>
         filter(Consent == "I agree that my data will be used in the manner described.") |>
-        #filter(StartDate > QUALTRICS_DAY2_STIME) |>
+        filter(StartDate > QUALTRICS_DAY2_STIME & EndDate < QUALTRICS_DAY2_ETIME) |>
   # renaming variables
   select(StartDate,EndDate,Status,Finished,RecordedDate,ResponseId,Consent,Preferred_topic,Degree,JEL_primary,
          starts_with("JEL_secondary"),starts_with("Versioning_"))
@@ -93,22 +129,8 @@ data2.table |> kable()
 ```
 
 
+## Possible extra
 
-## Day 2
-
-One of the following (or a linear combination):
-
-- [Reproducibility when some data are confidential](https://labordynamicsinstitute.github.io/reproducibility-confidential/) 
-- [Advanced self-checking of reproducibility](https://larsvilhuber.github.io/self-checking-reproducibility/presentation/)
-
-
-## Day 3
-
-
-- JIT Preservation of research output
-
-  - <https://labordynamicsinstitute.github.io/replication-tutorial-2019/#/18>
-  - <https://labordynamicsinstitute.github.io/tutorial-data-sharing-archiving-2021/#/2> (possibly challenging)
 
 - Short presentation on concerns about ethics in data dissemination
 - **In-depth tutorial on the use of Docker for economics research**

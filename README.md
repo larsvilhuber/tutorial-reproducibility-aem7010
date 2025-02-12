@@ -21,3 +21,10 @@ You should then set the GH Actions secrets with
 gh secret set -f .Renviron
 ```
 
+If you need to work in Codespaces, you will also need to add this to your Codespace secrets:
+
+```
+gh secret set -f .Renviron --user $GITHUB_REPOSITORY
+```
+
+then go to <https://github.com/settings/codespaces> and enable them for this repository (if not already done).
