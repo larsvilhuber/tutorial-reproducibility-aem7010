@@ -9,7 +9,7 @@ on:
     # hourly run
     #- cron: '3 * * * *'
     # daily run
-    - cron: '3 7 * * *'
+    #- cron: '3 7 * * *'
   workflow_dispatch:
 
 # This job installs dependencies, builds the book, and pushes it to `gh-pages`
